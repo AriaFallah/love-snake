@@ -49,6 +49,9 @@ function love.draw()
 
   -- Draw snake
   snake:draw()
+
+  -- Draw score
+  love.graphics.printf('Score: ' .. snake.score, 15, 15, 150, 'left')
   
   -- Draw walls
   for i = 1, #walls do

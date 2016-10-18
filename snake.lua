@@ -89,7 +89,7 @@ local function new(startPos, world)
     size = 10,
     speed = 1,
     score = 0,
-    length = 1,
+    length = 5,
     alive = true,
     world = world,
     direction = 'right',
