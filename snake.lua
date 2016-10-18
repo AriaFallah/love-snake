@@ -1,6 +1,23 @@
-local function update(self, world)
-  assert(world ~= nil)
+local util = require 'util'
 
+local function handleCollision(_, other)
+  return other.name == 'food' and 'cross' or 'touch'
+end
+
+local function grow(snake, x, y)
+  local newSegment = { x = x, y = y }
+
+  -- Add the new segment to the head and update snake accordingly
+  snake.head = newSegment
+  snake.score = snake.score + 1
+  snake.length = snake.length + 1
+  snake.body[snake.length] = newSegment
+
+  -- Add the new segment to the world
+  snake.world:add(newSegment, x, y, snake.size, snake.size)
+end
+
+local function update(self)
   local head = self.head
   local size = self.size
   local direction = self.direction
@@ -14,18 +31,24 @@ local function update(self, world)
   if love.keyboard.isDown('right') and direction ~= 'left' then self.direction = 'right' end
   
   -- Move the snake's head to the next location
-  if direction == 'up' then goalY = goalY - self.speed * size end
-  if direction == 'down' then goalY = goalY + self.speed * size end
-  if direction == 'left' then goalX = goalX - self.speed * size end
-  if direction == 'right' then goalX = goalX + self.speed * size end
+  if direction == 'up' then goalY = goalY - self.speed * size
+  elseif direction == 'down' then goalY = goalY + self.speed * size
+  elseif direction == 'left' then goalX = goalX - self.speed * size
+  elseif direction == 'right' then goalX = goalX + self.speed * size end
 
-  -- Check for collisions
-  local _, _, _, len = world:move(head, goalX, goalY)
-  if len > 0 then return false end
-
-  -- Move if there's no collision
-  head.x = goalX
-  head.y = goalY
+  -- Move snake in world and check for collisions
+  local _, _, cols, len = self.world:move(head, goalX, goalY, handleCollision)
+  if len > 0 then
+    local other = cols[1].other
+    if other.name == 'food' then
+      other:update()
+      grow(self, goalX, goalY)
+    else return false end
+  else
+    -- Actually move if there's no collision
+    head.x = goalX
+    head.y = goalY
+  end
 
   -- Make the body follow the head
   for i = #self.body - 1, 1, -1 do
@@ -40,7 +63,7 @@ local function update(self, world)
     -- Reposition each segment in the world
     -- We use "update" because it's not possible for the body to collide
     -- with anything because it's following the head
-    world:update(segment, segment.x, segment.y)
+    self.world:update(segment, segment.x, segment.y)
   end
 
   return true
@@ -49,7 +72,7 @@ end
 local function draw(self)
   for i = 1, #self.body do
     local segment = self.body[i]
-    love.graphics.rectangle("fill", segment.x, segment.y, self.size, self.size)
+    util.drawRect(segment.x, segment.y, self.size)
   end
 end
 
@@ -65,8 +88,10 @@ local function new(startPos, world)
     body = {},
     size = 10,
     speed = 1,
-    length = 25,
+    score = 0,
+    length = 1,
     alive = true,
+    world = world,
     direction = 'right',
   }
 
