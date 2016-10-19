@@ -21,8 +21,6 @@ local methods = {
 }
 
 local function new(xmin, xmax, ymin, ymax, world)
-  assert(xmin ~= nil and xmax ~= nil and ymin ~= nil and ymax ~= nil)
-  
   local food = {
     xmin = xmin,
     xmax = xmax,
