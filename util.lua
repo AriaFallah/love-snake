@@ -1,5 +1,4 @@
 local function drawRect(x, y, w, h)
-  assert(x ~= nil and y ~= nil and w ~= nil)
   love.graphics.rectangle('fill', x, y, w, h or w)
 end
 
