@@ -19,12 +19,13 @@ local function grow(snake, x, y)
 end
 
 local function update(self)
-  local q, head, size = self.q, self.head, self.size
-  local goalX, goalY = head.x, head.y
-  local prev = { x = head.x, y = head.y }
+  local q, size = self.q, self.size
 
   self.buffer = self.buffer + self.speed
   while self.buffer > size do
+    local head = self.head
+    local goalX, goalY = head.x, head.y
+    local prev = { x = head.x, y = head.y }
     self.direction = q:pop() or self.direction
 
     -- Move the snake's head to the next location
@@ -112,7 +113,6 @@ local function new(startPos, world)
   for i = 1, snake.length do
     local segment = {
       y = startPos.y,
-      name = 's' .. i,
       x = startPos.x + snake.size * (i - 1),
     }
 
