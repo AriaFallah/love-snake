@@ -40,7 +40,13 @@ end
 
 function love.update()
   -- Keep updating the snake while it hasn't collided with anything
-  if snake.alive then snake.alive = snake:update() end
+  if snake.alive then
+    snake.alive = snake:update()
+  else
+    function love.keypressed()
+      love.load();
+    end
+  end
 end
 
 function love.draw()
